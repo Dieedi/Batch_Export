@@ -53,7 +53,7 @@ On the right there is some basics options for fbx/gltf export) and the possibili
 
 ## Authors
 
-Created by [Dieedi](https://github.com/Dieedi)
+Created by [Jeremy Pouillot](https://github.com/Dieedi)
 
 ## Support
 
