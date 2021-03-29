@@ -27,7 +27,7 @@ On the right there is some basics options for fbx/gltf export) and the possibili
 
 ## Installation
 
-1. Download add-on (zipped) from this [link](https://github.com/Dieedi/Batch_Export/releases/download/v0.1.4/Batch_Export-v0.1.4.zip).
+1. Download add-on (zipped) from this [link](https://github.com/Dieedi/Batch_Export/releases/tag/v0.1.4).
 2. In blender, go to : Edit -> Preferences -> Add-ons -> Install.
 3. Select the downloaded file and you're good to go.
 
