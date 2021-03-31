@@ -114,7 +114,11 @@ def gltfexport (self, context):
     batch_properties = bpy.context.scene.batch_exporter
 
     for obj in selection:
-        batch_properties = bpy.context.scene.batch_exporter
+
+        obj.select_set(True)
+
+        # some exporters only use the active object
+        view_layer.objects.active = obj
 
         name = bpy.path.clean_name(obj.name)
         file_ext = ""
@@ -151,7 +155,7 @@ def gltfexport (self, context):
             export_colors=True,
             export_cameras=False,
             export_selected=False,
-            use_selection=False,
+            use_selection=True,
             export_extras=False,
             export_yup=True,
             export_apply=False,
