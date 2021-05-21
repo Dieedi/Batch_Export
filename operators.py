@@ -40,6 +40,8 @@ def fbxexport(self, context):
             
             if not os.path.exists(export_folder):
                 os.mkdir(export_folder)  
+        else:
+            export_folder = batch_properties.ExportFolder + "\\"
 
         bpy.ops.export_scene.fbx(
             filepath=export_folder + name + ".fbx",
@@ -133,7 +135,9 @@ def gltfexport (self, context):
             export_folder = batch_properties.ExportFolder + name + "\\"
             
             if not os.path.exists(export_folder):
-                os.mkdir(export_folder)        
+                os.mkdir(export_folder)  
+        else:
+            export_folder = batch_properties.ExportFolder + "\\"      
 
         bpy.ops.export_scene.gltf(
             export_format=batch_properties.export_format,
