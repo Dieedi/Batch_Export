@@ -2,7 +2,7 @@ bl_info = {
     "name": "Batch Exporter",
     "description": "Export multiple objects to fbx files named as the objects are.",
     "author": "Jeremy Pouillot",
-    "version": (0, 1, 4),
+    "version": (0, 1, 5),
     "blender": (2, 91, 0),
     "location": "View3D > Tool Shelf > Tool Tab",
     "warning": "WIP",
@@ -98,6 +98,11 @@ class BatchexporterSettings(bpy.types.PropertyGroup):
     export_multipleFolder: BoolProperty(
         name='Export Multiple Folder',
         description="Export selected objects to independent folders named as each object",
+        default=False,
+    )
+    apply_transform: BoolProperty(
+        name="Apply Transform",
+        description="Bake space transform into object data",
         default=False,
     )
 

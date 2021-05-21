@@ -52,7 +52,7 @@ def fbxexport(self, context):
             apply_unit_scale=True,
             apply_scale_options='FBX_SCALE_NONE',
             #use_space_transform=True,
-            bake_space_transform=False,
+            bake_space_transform=batch_properties.apply_transform,
             object_types=batch_properties.ObjectTypes,
             use_mesh_modifiers=True,
             use_mesh_modifiers_render=True,
@@ -247,6 +247,8 @@ class OpenFolderBrowser(Operator, ExportHelper):
         layout.label(text="Global")
         row = layout.row(align=True)
         row.prop(batch_exporter, "export_multipleFolder")
+        row = layout.row(align=True)
+        row.prop(batch_exporter, "apply_transform")
 
     # Rewrite Invoke to avoid blend_filepath with file name
     def invoke(self, context, _event):
