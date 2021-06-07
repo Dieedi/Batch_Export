@@ -9,6 +9,17 @@ from bpy_extras.io_utils import (
     path_reference_mode,
 )
 
+def children_list(object, temp_list=None):
+    if (temp_list == None):
+        temp_list = []
+
+    for obj in object.children:
+        print(obj.name)
+        temp_list.append(obj)
+        children_list(obj, temp_list)
+
+    return temp_list
+
 def fbxexport(self, context):
     """ use export fbx addon """
     view_layer = bpy.context.view_layer
@@ -24,74 +35,180 @@ def fbxexport(self, context):
 
     batch_properties = bpy.context.scene.batch_exporter
 
+    newselection = []
+    current_objects = []
+    meshes_obj = []
+    empties_obj = []
+    noemptie_obj = []
+
+    # consider empty and children as selection and export selection
     for obj in selection:
+        if obj.type == "EMPTY":
+            empties_obj.append(obj)
+        elif obj.type == "MESH":
+            meshes_obj.append(obj)
 
-        obj.select_set(True)
-
-        # some exporters only use the active object
-        view_layer.objects.active = obj
-
-        name = bpy.path.clean_name(obj.name)
-        export_folder = ""
-        #fn = os.path.join(basedir, name)
-        
-        if batch_properties.export_multipleFolder:
-            export_folder = batch_properties.ExportFolder + name + "\\"
-            
-            if not os.path.exists(export_folder):
-                os.mkdir(export_folder)  
+    for e in range(len(empties_obj)):
+        if empties_obj[e].parent:
+            continue
         else:
-            export_folder = batch_properties.ExportFolder + "\\"
+            current_objects.append(empties_obj[e])
+            current_objects.extend(children_list(empties_obj[e]))
+            print(len(current_objects))
+            newselection.append(current_objects[:])
+            current_objects.clear()
 
-        bpy.ops.export_scene.fbx(
-            filepath=export_folder + name + ".fbx",
-            check_existing=True,
-            filter_glob='*.fbx',
-            # use selection ... no ?
-            use_selection=True,
-            use_active_collection=False,
-            global_scale=1.0,
-            apply_unit_scale=True,
-            apply_scale_options='FBX_SCALE_NONE',
-            #use_space_transform=True,
-            bake_space_transform=batch_properties.apply_transform,
-            object_types=batch_properties.ObjectTypes,
-            use_mesh_modifiers=True,
-            use_mesh_modifiers_render=True,
-            mesh_smooth_type='OFF',
-            use_subsurf=False,
-            use_mesh_edges=False,
-            use_tspace=False,
-            use_custom_props=False,
-            add_leaf_bones=True,
-            primary_bone_axis='Y',
-            secondary_bone_axis='X',
-            use_armature_deform_only=False,
-            armature_nodetype='NULL',
-            bake_anim=True,
-            bake_anim_use_all_bones=True,
-            bake_anim_use_nla_strips=True,
-            bake_anim_use_all_actions=True,
-            bake_anim_force_startend_keying=True,
-            bake_anim_step=1.0,
-            bake_anim_simplify_factor=1.0,
-            path_mode=batch_properties.path_mode,
-            embed_textures=False,
-            batch_mode='OFF',
-            use_batch_own_dir=True,
-            use_metadata=True,
-            axis_forward=batch_properties.axis_forward,
-            axis_up=batch_properties.axis_up,
-        )
+    for m in range(len(meshes_obj)):
+        if not meshes_obj[m].parent:
+            noemptie_obj.append(meshes_obj[m])
 
-        # Can be used for multiple formats
-        # bpy.ops.export_scene.x3d(filepath=fn + ".x3d", use_selection=True)
+    if len(empties_obj) == 0:
+        for m in range(len(meshes_obj)):
+            noemptie_obj.append(meshes_obj[m])
 
-        obj.select_set(False)
+    name = ""
 
-        #print("written:", fn)
+    if len(newselection) > 0:
+        for select in newselection:
+            # some exporters only use the active object
+            # view_layer.objects.active = obj
+            print("selec in selection : " + str(len(select)))
 
-    self.report({'INFO'}, "%s fbx exported successfully." % (len(selection)))
+            for obj in select:
+                obj.select_set(True)
+                if obj.type == "EMPTY" and (not name or name == "undefined"):
+                    name = bpy.path.clean_name(obj.name)
+                elif not name:
+                    name = "undefined"
+
+            export_folder = ""
+            #fn = os.path.join(basedir, name)
+
+            if batch_properties.export_multipleFolder:
+                export_folder = batch_properties.ExportFolder + name + "\\"
+                
+                if not os.path.exists(export_folder):
+                    os.mkdir(export_folder)  
+            else:
+                export_folder = batch_properties.ExportFolder + "\\"
+
+            bpy.ops.export_scene.fbx(
+                filepath=export_folder + name + ".fbx",
+                check_existing=True,
+                filter_glob='*.fbx',
+                # use selection ... no ?
+                use_selection=True,
+                use_active_collection=False,
+                global_scale=1.0,
+                apply_unit_scale=True,
+                apply_scale_options='FBX_SCALE_NONE',
+                #use_space_transform=True,
+                bake_space_transform=batch_properties.apply_transform,
+                object_types=batch_properties.ObjectTypes,
+                use_mesh_modifiers=True,
+                use_mesh_modifiers_render=True,
+                mesh_smooth_type='OFF',
+                use_subsurf=False,
+                use_mesh_edges=False,
+                use_tspace=False,
+                use_custom_props=False,
+                add_leaf_bones=True,
+                primary_bone_axis='Y',
+                secondary_bone_axis='X',
+                use_armature_deform_only=False,
+                armature_nodetype='NULL',
+                bake_anim=True,
+                bake_anim_use_all_bones=True,
+                bake_anim_use_nla_strips=True,
+                bake_anim_use_all_actions=True,
+                bake_anim_force_startend_keying=True,
+                bake_anim_step=1.0,
+                bake_anim_simplify_factor=1.0,
+                path_mode=batch_properties.path_mode,
+                embed_textures=False,
+                batch_mode='OFF',
+                use_batch_own_dir=True,
+                use_metadata=True,
+                axis_forward=batch_properties.axis_forward,
+                axis_up=batch_properties.axis_up,
+            )
+
+            for obj in select:
+                obj.select_set(False)
+            
+            name = ""
+        
+        self.report({'INFO'}, "%s fbx exported successfully." % (len(newselection)))
+    
+    if len(noemptie_obj) > 0:
+        for obj in noemptie_obj:
+
+            obj.select_set(True)
+
+            # some exporters only use the active object
+            view_layer.objects.active = obj
+
+            name = bpy.path.clean_name(obj.name)
+            export_folder = ""
+            #fn = os.path.join(basedir, name)
+
+            if batch_properties.export_multipleFolder:
+                export_folder = batch_properties.ExportFolder + name + "\\"
+                
+                if not os.path.exists(export_folder):
+                    os.mkdir(export_folder)  
+            else:
+                export_folder = batch_properties.ExportFolder + "\\"
+
+            bpy.ops.export_scene.fbx(
+                filepath=export_folder + name + ".fbx",
+                check_existing=True,
+                filter_glob='*.fbx',
+                # use selection ... no ?
+                use_selection=True,
+                use_active_collection=False,
+                global_scale=1.0,
+                apply_unit_scale=True,
+                apply_scale_options='FBX_SCALE_NONE',
+                #use_space_transform=True,
+                bake_space_transform=batch_properties.apply_transform,
+                object_types=batch_properties.ObjectTypes,
+                use_mesh_modifiers=True,
+                use_mesh_modifiers_render=True,
+                mesh_smooth_type='OFF',
+                use_subsurf=False,
+                use_mesh_edges=False,
+                use_tspace=False,
+                use_custom_props=False,
+                add_leaf_bones=True,
+                primary_bone_axis='Y',
+                secondary_bone_axis='X',
+                use_armature_deform_only=False,
+                armature_nodetype='NULL',
+                bake_anim=True,
+                bake_anim_use_all_bones=True,
+                bake_anim_use_nla_strips=True,
+                bake_anim_use_all_actions=True,
+                bake_anim_force_startend_keying=True,
+                bake_anim_step=1.0,
+                bake_anim_simplify_factor=1.0,
+                path_mode=batch_properties.path_mode,
+                embed_textures=False,
+                batch_mode='OFF',
+                use_batch_own_dir=True,
+                use_metadata=True,
+                axis_forward=batch_properties.axis_forward,
+                axis_up=batch_properties.axis_up,
+            )
+
+            # Can be used for multiple formats
+            # bpy.ops.export_scene.x3d(filepath=fn + ".x3d", use_selection=True)
+
+            obj.select_set(False)
+
+            #print("written:", fn)
+        self.report({'INFO'}, "%s fbx exported successfully." % (len(newselection) + len(noemptie_obj)))
+
 
     view_layer.objects.active = obj_active
 

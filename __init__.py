@@ -2,7 +2,7 @@ bl_info = {
     "name": "Batch Exporter",
     "description": "Export multiple objects to fbx files named as the objects are.",
     "author": "Jeremy Pouillot",
-    "version": (0, 1, 5),
+    "version": (0, 1, 6),
     "blender": (2, 91, 0),
     "location": "View3D > Tool Shelf > Tool Tab",
     "warning": "WIP",
